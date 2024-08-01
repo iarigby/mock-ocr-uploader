@@ -10,9 +10,10 @@ export async function uploadImage(formData: FormData): Promise<string> {
 
 function apiFetch(route: string, params: RequestInit) {
     return fetch(getServerURL() + route, params)
-        .then(res => {
+        .then(async (res) => {
             if (!res.ok) {
-                throw new ApiError(res);
+                const details: ApiErrorResponse = await res.json()
+                throw new ApiError(details)
             }
             return res.json()
         })
@@ -22,10 +23,19 @@ export function getServerURL() {
     return process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3001"
 }
 
+interface ApiErrorResponse {
+    statusCode: number;
+    message?: string;
+}
+
 class ApiError extends Error {
     status: number
-    constructor(response: Response) {
-        super(response.statusText)
-        this.status = response.status;
+    constructor(errorDetails: ApiErrorResponse) {
+        super(errorDetails.message)
+        this.status = errorDetails.statusCode;
     }
+}
+
+export function isApiError(error: Error): error is ApiError {
+    return 'status' in error && error.status == 400
 }

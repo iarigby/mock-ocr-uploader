@@ -1,10 +1,10 @@
 import {afterAll, afterEach, beforeAll, expect, test} from 'vitest'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import Page from '@/app/ocr/page'
 import {getServerURL} from "@/app/server";
-import userEvent from "@testing-library/user-event";
+import userEvent, {UserEvent} from "@testing-library/user-event";
 
 
 const server = setupServer(
@@ -20,12 +20,12 @@ afterAll(() => server.close())
 
 test('upload file', async () => {
     await uploadFile()
-    await screen.findByRole('heading', {level: 2, name: 'Here is the analysed text'})
+    await waitFor(() => screen.getByRole('heading', {level: 2, name: 'Here is the analysed text'}))
 })
 
 test('upload file error handling', async() => {
     server.use(
-        http.post( getServerURL() + '/ocr', () => {
+        http.post( getServerURL() + '/ocr', (request) => {
         return new HttpResponse(null, {statusText: 'wrong image', status: 400})
     }))
     await uploadFile()
@@ -43,5 +43,4 @@ async function uploadFile() {
     expect(input.files).not.toBeNull()
     expect(input.files![0]).toBe(file)
     await user.click(screen.getByText('Upload Image'))
-
 }
