@@ -1,0 +1,9 @@
+services:
+  backend:
+    build: ./ocr-be
+    ports:
+      - 3001:3001
+  frontend:
+    build: ./ocr-fe
+    ports:
+      - 3000:3000
