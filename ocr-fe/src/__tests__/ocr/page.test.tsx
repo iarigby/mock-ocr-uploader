@@ -4,7 +4,7 @@ import {setupServer} from 'msw/node'
 import {render, screen, waitFor} from '@testing-library/react'
 import Page from '@/app/ocr/page'
 import {getServerURL} from "@/app/server";
-import userEvent, {UserEvent} from "@testing-library/user-event";
+import userEvent from "@testing-library/user-event";
 
 
 const server = setupServer(
@@ -30,7 +30,7 @@ test('upload file error handling', async() => {
     }))
     await uploadFile()
     await screen.findByText('Your image is invalid')
-    expect(screen.getByText('wrong image')).toBeDefined()
+    expect(screen.getByText('wrong image. Please Select Another Image')).toBeDefined()
 })
 
 async function uploadFile() {

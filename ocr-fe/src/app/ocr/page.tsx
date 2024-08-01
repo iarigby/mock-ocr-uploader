@@ -1,70 +1,57 @@
 'use client'
 
 import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
-import {FormEvent, useEffect, useState} from "react";
-import {isApiError, uploadImage} from "@/app/server";
+import React, {useEffect, useState} from "react";
+import {isApiError} from "@/app/server";
+import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
+import UploadDialogue from "@/app/ocr/uploadDialogue";
+import OcrResult from "@/app/ocr/ocrResult";
 
 
 export default function Ocr() {
     const [resultText, setResultText] = useState<string>();
     const [error, setError] = useState<Error>();
     if (resultText) {
-        return <div>
-            <OcrResponse res={resultText}></OcrResponse>
-            <Button onClick={() => setResultText(undefined)}>Upload Another Image</Button>
-        </div>
+        return <Card className="w-[400px]">
+            <CardHeader>
+                <CardTitle>Your image was successfully processed</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-10">
+                <OcrResult res={resultText}></OcrResult>
+            </CardContent>
+            <CardFooter className="flex justify-end">
+                <Button onClick={() => setResultText(undefined)}>Upload Another Image</Button>
+            </CardFooter>
+        </Card>
     }
-    return <div className="w-100">
-        <Upload setResultText={setResultText} setError={setError}></Upload>
-        {error && <ErrorDisplay error={error}></ErrorDisplay>}
-    </div>
+    return <Card className="w-[400px]">
+        <CardHeader>
+            <CardTitle>Try Out OCR Cloud</CardTitle>
+        </CardHeader>
+        <CardContent>
+            <UploadDialogue setResultText={setResultText} setError={setError}></UploadDialogue>
+            {error && <div className="space-y-10"><ErrorDisplay error={error}></ErrorDisplay></div>}
+        </CardContent>
+    </Card>
 }
 
 
-function Upload({setResultText, setError}: { setResultText: (s: string) => void, setError: (e?: Error) => void }) {
-    function setResult(result: string, event: FormEvent<HTMLFormElement>) {
-        setResultText(result)
-        setError()
-        // @ts-ignore
-        event.target.reset()
-    }
-
-    async function onSubmit(event: FormEvent<HTMLFormElement>) {
-        event.preventDefault()
-        const formData = new FormData(event.currentTarget)
-        uploadImage(formData)
-            .then((result) => setResult(result, event))
-            .catch(setError)
-    }
-
-    return <form onSubmit={onSubmit}>
-        <Input type="file" id="uploaded-image" required={true} name="file" onChange={() => setError()} aria-label="image-input"
-               accept=".png,.jpg,.jpeg"/>
-        <Button>Upload Image</Button>
-    </form>
-}
-
-function OcrResponse({res}: { res: string }) {
-    return <div>
-        <h2>Here is the analysed text</h2>
-        <p> {res}</p>
-    </div>
-}
 
 function ErrorDisplay({error}: { error: Error }) {
     useEffect(() => {
         !isApiError(error) && console.log(error)
     }, [error]);
     if (isApiError(error)) {
-        return <div>
-            <h2>Your image is invalid</h2>
-            <p>{error.message}</p>
-            <p>Please Select Another Image</p>
-        </div>
+        return <Alert variant="destructive" className="mt-7">
+            <AlertTitle>Your image is invalid</AlertTitle>
+            <AlertDescription>
+                {error.message}. Please Select Another Image
+            </AlertDescription>
+        </Alert>
     }
 
-    return <div>
-        <p>Unknown Error occurred, please try again</p>
-    </div>
+    return <Alert variant="destructive">
+        <AlertDescription>Unknown Error occurred, please try again</AlertDescription>
+    </Alert>
 }
