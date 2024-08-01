@@ -27,7 +27,7 @@ export default function Ocr() {
     }
     return <Card className="w-[400px]">
         <CardHeader>
-            <CardTitle>Try Out OCR Cloud</CardTitle>
+            <CardTitle>Try Out Cloud OCR</CardTitle>
         </CardHeader>
         <CardContent>
             <UploadDialogue setResultText={setResultText} setError={setError}></UploadDialogue>
