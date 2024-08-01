@@ -1,10 +1,15 @@
 export async function getVersion(): Promise<string> {
-    return apiFetch('/version')
+    return apiFetch('/version', {})
         .then(res => res.version)
 }
 
-function apiFetch(route: string) {
-    return fetch(getServerURL() + route)
+export async function uploadImage(formData: FormData): Promise<string> {
+    return apiFetch('/ocr', {method: 'POST', body: formData})
+        .then(res => res.ocrResult)
+}
+
+function apiFetch(route: string, params: RequestInit) {
+    return fetch(getServerURL() + route, params)
         .then(res => {
             if (!res.ok) {
                 throw new ApiError(res);
@@ -18,9 +23,9 @@ export function getServerURL() {
 }
 
 class ApiError extends Error {
-    errorCode: number
+    status: number
     constructor(response: Response) {
         super(response.statusText)
-        this.errorCode = response.status;
+        this.status = response.status;
     }
 }
