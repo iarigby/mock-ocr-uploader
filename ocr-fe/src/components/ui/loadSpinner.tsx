@@ -1,4 +1,4 @@
-import { cn } from "@/components/utils"
+import { cn } from "@/lib/utils"
 
 
 export interface ISVGProps extends React.SVGProps<SVGSVGElement> {
