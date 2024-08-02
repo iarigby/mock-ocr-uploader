@@ -1,4 +1,10 @@
 # Mock OCR Uploader
+
+Contents:
+- Running Instructions
+- Summary
+- Report (Based On Provided Task Description)
+
 ## Running
 ### Docker
 
